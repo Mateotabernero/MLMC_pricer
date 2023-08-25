@@ -1,17 +1,27 @@
+
+import mlmc
+
 def euler_step(X,r,h,sig,dW):
     return X + r*X*h + sig*X*dW
 
 def milstein_step(X,r,h,sig, dW): 
     return X + r*X*h + sig*X*dW + 1/2 * (sig**2)*(dW**2 - h) 
 
+def rk_step(X,r,h,sig,dW):
+    X_hat = X + r*X*h + sig*X*np.sqrt(h) 
+    return X + r*X*h + sig*X*dW + 1/(2*math.sqrt(h))*(dW**2 - h)*(sig*(X_hat -X)) 
+
 def opre_gbm (l,N, X0, r, sig, T, M, payOff, integration_method = 'E', ant_variates = False, randn = np.random.randn): 
     
-    if integration_method =='E': 
-        step = euler_step 
-    
-    elif integration_method == 'M':
-        step = milstein_step
-    
+    match integration_method:
+        case 'E': 
+            step = euler_step
+        case 'M': 
+            step = milstein_step
+        case 'RK':
+            step = rk_step 
+        case _:
+            raise ValueError("Please choose an appropiate integration method")
     
     
     nf = M**l 
